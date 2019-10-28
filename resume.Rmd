@@ -1,0 +1,11 @@
+---
+title: "Resume"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+<a href="mparker7.github.io/resume.pdf" target="_blank">resume.</a>
+
+![here](resume.pdf)
