@@ -6,6 +6,4 @@ output:
     toc_float: true
 ---
 
-<a href="mparker7.github.io/resume.pdf" target="_blank">resume.</a>
-
-![here](resume.pdf)
+To get an idea of my academic and professional experience, see my resume <a href="mparker7.github.io/resume.pdf" target="_blank">here.</a>
