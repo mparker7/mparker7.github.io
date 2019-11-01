@@ -1,0 +1,105 @@
+---
+title: "NYC Restaurant Inspections Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(viridis)
+library(p8105.datasets)
+library(plotly)
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+```
+
+```{r}
+set.seed(1)
+
+data(instacart)
+```
+
+
+Column {data-width=550}
+-----------------------------------------------------------------------
+
+### Bar plot
+
+```{r}
+instacart %>% 
+  group_by(order_id) %>% 
+  filter(add_to_cart_order == 1 | add_to_cart_order == max(add_to_cart_order)) %>% 
+  ungroup() %>% 
+  mutate(
+    item_ordered = if_else(add_to_cart_order == 1, "first", "last"),
+    department = fct_infreq(department)
+  ) %>% 
+  select(department, item_ordered) %>% 
+  count(department, item_ordered) %>% 
+  plot_ly(x = ~department, y = ~n, color = ~item_ordered, type = "bar", colors = "Set2") %>% 
+    layout(
+    xaxis = list(title = "Department"),
+    yaxis = list(title = "Item Order Count"),
+    title = "Department Order Count for First and Last Item within Order"
+  )
+  
+```
+
+Column {data-width=450}
+-----------------------------------------------------------------------
+
+### Box plot
+
+```{r}
+instacart %>%
+  group_by(order_id) %>% 
+  mutate(
+    order_size = max(add_to_cart_order)
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    days_since_prior_order = factor(days_since_prior_order)
+  ) %>%
+  select(order_id, days_since_prior_order, order_size) %>% 
+  distinct() %>% 
+  plot_ly(y = ~order_size, color = ~days_since_prior_order, type = "box", colors = "Set2") %>% 
+  layout(
+    xaxis = list(title = "Days Since Prior Order"),
+    yaxis = list(title = "Order Size"),
+    title = "Distribution of Order Size by Days Since Prior Order"
+  )
+```
+
+### Histogram
+
+```{r}
+instacart %>% 
+  group_by(order_id) %>% 
+  mutate(
+    order_size = max(add_to_cart_order)
+  ) %>% 
+  ungroup() %>%
+  select(order_id, order_hour_of_day, order_size) %>% 
+  distinct() %>% 
+  mutate(
+    order_part_of_day = if_else(order_hour_of_day %in% 6:13, "Early", "Late")
+  ) %>% 
+  plot_ly(x = ~order_size, color = ~order_part_of_day, type = "histogram", colors = "Set2", nbinsx = 20) %>% 
+  layout(
+    xaxis = list(title = "Order Size"),
+    yaxis = list(title = "Number of Orders"),
+    title = "Order Size for Orders Placed Early vs Late in the Day"
+  )
+```
+
